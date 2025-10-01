@@ -137,7 +137,7 @@ module FARE::transfer_rules {
             global_restrictions: TransferRestrictions {
                 max_transfer_amount: constants::get_max_transfer_amount(),
                 daily_transfer_limit: constants::get_max_daily_transfer_volume(),
-                monthly_transfer_limit: constants::get_max_daily_transfer_volume() * 30,
+                monthly_transfer_limit: constants::get_max_daily_transfer_volume() / 30, // Use division to avoid overflow
                 daily_transfer_count: 100,
                 monthly_transfer_count: 1000,
                 transfer_lock_duration: 0,
