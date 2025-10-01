@@ -316,7 +316,8 @@ module FARE::modular_compliance {
         check_data: vector<u8>
     ): ComprehensiveComplianceResult acquires ModularComplianceRegistry {
         let account_addr = signer::address_of(account);
-        let registry = borrow_global_mut<ModularComplianceRegistry>(account_addr);
+        // Registry is stored at the admin address, not the user address
+        let registry = borrow_global_mut<ModularComplianceRegistry>(@0x1);
         let current_time = timestamp::now_seconds();
         
         // Check if token compliance is initialized

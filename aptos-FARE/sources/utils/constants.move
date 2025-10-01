@@ -80,6 +80,8 @@ module FARE::constants {
     const EINVALID_AMOUNT: u64 = 6008;
     const EINVALID_DURATION: u64 = 6009;
     const EINVALID_COUNTRY_CODE: u64 = 6010;
+    const EINSUFFICIENT_KYC_LEVEL: u64 = 6011;
+    const EINSUFFICIENT_INVESTOR_TYPE: u64 = 6012;
 
     // ========== CLAIM TOPICS (ERC-735 Standard) ==========
     
@@ -290,6 +292,16 @@ module FARE::constants {
     /// Get error code for insufficient balance
     public fun get_insufficient_balance_error(): u64 {
         EINSUFFICIENT_BALANCE
+    }
+    
+    /// Get error code for insufficient KYC level
+    public fun get_insufficient_kyc_level_error(): u64 {
+        EINSUFFICIENT_KYC_LEVEL
+    }
+    
+    /// Get error code for insufficient investor type
+    public fun get_insufficient_investor_type_error(): u64 {
+        EINSUFFICIENT_INVESTOR_TYPE
     }
 
     // ========== ADDITIONAL ERROR GETTERS ==========

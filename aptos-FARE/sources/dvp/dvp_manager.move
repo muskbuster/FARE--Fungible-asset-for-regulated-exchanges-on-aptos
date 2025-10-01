@@ -227,7 +227,8 @@ module FARE::dvp_manager {
         expiry: u64
     ): u64 acquires DVPManagerRegistry {
         let seller = signer::address_of(account);
-        let registry = borrow_global_mut<DVPManagerRegistry>(seller);
+        // Registry is stored at the admin address, not the seller address
+        let registry = borrow_global_mut<DVPManagerRegistry>(@0x1);
         let current_time = timestamp::now_seconds();
         
         // Validate parameters
@@ -304,7 +305,8 @@ module FARE::dvp_manager {
         order_id: u64
     ) acquires DVPManagerRegistry {
         let canceller = signer::address_of(account);
-        let registry = borrow_global_mut<DVPManagerRegistry>(canceller);
+        // Registry is stored at the admin address, not the user address
+        let registry = borrow_global_mut<DVPManagerRegistry>(@0x1);
         let current_time = timestamp::now_seconds();
         
         // Check if order exists
@@ -336,7 +338,8 @@ module FARE::dvp_manager {
         order_id: u64
     ) acquires DVPManagerRegistry {
         let executor = signer::address_of(account);
-        let registry = borrow_global_mut<DVPManagerRegistry>(executor);
+        // Registry is stored at the admin address, not the user address
+        let registry = borrow_global_mut<DVPManagerRegistry>(@0x1);
         let current_time = timestamp::now_seconds();
         
         // Check if order exists
@@ -352,6 +355,22 @@ module FARE::dvp_manager {
         
         // Check if executor is buyer
         assert!(order.buyer == executor, constants::get_access_control_not_authorized_error());
+        
+        // Check if buyer has sufficient payment tokens
+        let buyer_payment_balance = trex_token::get_user_balance(order.buyer, order.payment_token_address);
+        assert!(buyer_payment_balance >= order.payment_amount, constants::get_insufficient_balance_error());
+        
+        // Check if seller has sufficient tokens
+        let seller_token_balance = trex_token::get_user_balance(order.seller, order.token_address);
+        assert!(seller_token_balance >= order.token_amount, constants::get_insufficient_balance_error());
+        
+        // Perform the actual token transfers
+        // For DVP, we use the special DVP transfer function
+        // Transfer tokens from seller to buyer
+        trex_token::dvp_transfer(order.seller, order.buyer, order.token_address, order.token_amount);
+        
+        // Transfer payment tokens from buyer to seller
+        trex_token::dvp_transfer(order.buyer, order.seller, order.payment_token_address, order.payment_amount);
         
         // Create escrow
         let escrow_id = create_escrow_internal(registry, order_id, current_time);
@@ -458,7 +477,7 @@ module FARE::dvp_manager {
     
     /// Get DVP order information
     public fun get_dvp_order(order_id: u64): (address, address, address, u64, u64, address, u8, u64, u64, u64) acquires DVPManagerRegistry {
-        let registry = borrow_global<DVPManagerRegistry>(@0x0); // This will need to be updated with actual address
+        let registry = borrow_global<DVPManagerRegistry>(@0x1); // Registry stored at admin address
         assert!(table::contains(&registry.dvp_orders, order_id), constants::get_dvp_order_not_found_error());
         
         let order = table::borrow(&registry.dvp_orders, order_id);
@@ -478,7 +497,7 @@ module FARE::dvp_manager {
     
     /// Get DVP escrow information
     public fun get_dvp_escrow(escrow_id: u64): (u64, address, address, address, u64, u64, address, u8, u64, u64) acquires DVPManagerRegistry {
-        let registry = borrow_global<DVPManagerRegistry>(@0x0); // This will need to be updated with actual address
+        let registry = borrow_global<DVPManagerRegistry>(@0x1); // Registry stored at admin address
         assert!(table::contains(&registry.dvp_escrows, escrow_id), constants::get_dvp_escrow_not_found_error());
         
         let escrow = table::borrow(&registry.dvp_escrows, escrow_id);
@@ -498,7 +517,7 @@ module FARE::dvp_manager {
     
     /// Get DVP settlement information
     public fun get_dvp_settlement(settlement_id: u64): (u64, address, address, address, u64, u64, address, u8, u64) acquires DVPManagerRegistry {
-        let registry = borrow_global<DVPManagerRegistry>(@0x0); // This will need to be updated with actual address
+        let registry = borrow_global<DVPManagerRegistry>(@0x1); // Registry stored at admin address
         assert!(table::contains(&registry.dvp_settlements, settlement_id), constants::get_dvp_settlement_failed_error());
         
         let settlement = table::borrow(&registry.dvp_settlements, settlement_id);
@@ -517,7 +536,7 @@ module FARE::dvp_manager {
     
     /// Check DVP order status
     public fun check_dvp_order_status(order_id: u64): u8 acquires DVPManagerRegistry {
-        let registry = borrow_global<DVPManagerRegistry>(@0x0); // This will need to be updated with actual address
+        let registry = borrow_global<DVPManagerRegistry>(@0x1); // Registry stored at admin address
         assert!(table::contains(&registry.dvp_orders, order_id), constants::get_dvp_order_not_found_error());
         
         let order = table::borrow(&registry.dvp_orders, order_id);
@@ -526,7 +545,7 @@ module FARE::dvp_manager {
     
     /// Get user's DVP orders
     public fun get_user_dvp_orders(user: address): vector<u64> acquires DVPManagerRegistry {
-        let registry = borrow_global<DVPManagerRegistry>(user);
+        let registry = borrow_global<DVPManagerRegistry>(@0x1);
         
         if (!table::contains(&registry.user_orders, user)) {
             return vector::empty()
@@ -537,13 +556,13 @@ module FARE::dvp_manager {
     
     /// Check if DVP order exists
     public fun does_dvp_order_exist(order_id: u64): bool acquires DVPManagerRegistry {
-        let registry = borrow_global<DVPManagerRegistry>(@0x0); // This will need to be updated with actual address
+        let registry = borrow_global<DVPManagerRegistry>(@0x1); // Registry stored at admin address
         table::contains(&registry.dvp_orders, order_id)
     }
     
     /// Check if DVP order is expired
     public fun is_dvp_order_expired(order_id: u64): bool acquires DVPManagerRegistry {
-        let registry = borrow_global<DVPManagerRegistry>(@0x0); // This will need to be updated with actual address
+        let registry = borrow_global<DVPManagerRegistry>(@0x1); // Registry stored at admin address
         assert!(table::contains(&registry.dvp_orders, order_id), constants::get_dvp_order_not_found_error());
         
         let order = table::borrow(&registry.dvp_orders, order_id);
@@ -553,37 +572,37 @@ module FARE::dvp_manager {
     
     /// Get next order ID
     public fun get_next_order_id(): u64 acquires DVPManagerRegistry {
-        let registry = borrow_global<DVPManagerRegistry>(@0x0); // This will need to be updated with actual address
+        let registry = borrow_global<DVPManagerRegistry>(@0x1); // Registry stored at admin address
         registry.next_order_id
     }
     
     /// Get next escrow ID
     public fun get_next_escrow_id(): u64 acquires DVPManagerRegistry {
-        let registry = borrow_global<DVPManagerRegistry>(@0x0); // This will need to be updated with actual address
+        let registry = borrow_global<DVPManagerRegistry>(@0x1); // Registry stored at admin address
         registry.next_escrow_id
     }
     
     /// Get next settlement ID
     public fun get_next_settlement_id(): u64 acquires DVPManagerRegistry {
-        let registry = borrow_global<DVPManagerRegistry>(@0x0); // This will need to be updated with actual address
+        let registry = borrow_global<DVPManagerRegistry>(@0x1); // Registry stored at admin address
         registry.next_settlement_id
     }
     
     /// Get total number of DVP orders
     public fun get_total_dvp_orders(): u64 acquires DVPManagerRegistry {
-        let registry = borrow_global<DVPManagerRegistry>(@0x0); // This will need to be updated with actual address
+        let registry = borrow_global<DVPManagerRegistry>(@0x1); // Registry stored at admin address
         registry.next_order_id - 1
     }
     
     /// Get total number of DVP escrows
     public fun get_total_dvp_escrows(): u64 acquires DVPManagerRegistry {
-        let registry = borrow_global<DVPManagerRegistry>(@0x0); // This will need to be updated with actual address
+        let registry = borrow_global<DVPManagerRegistry>(@0x1); // Registry stored at admin address
         registry.next_escrow_id - 1
     }
     
     /// Get total number of DVP settlements
     public fun get_total_dvp_settlements(): u64 acquires DVPManagerRegistry {
-        let registry = borrow_global<DVPManagerRegistry>(@0x0); // This will need to be updated with actual address
+        let registry = borrow_global<DVPManagerRegistry>(@0x1); // Registry stored at admin address
         registry.next_settlement_id - 1
     }
 }

@@ -80,7 +80,8 @@ module FARE::onchain_identity {
         date_of_birth: u64
     ) acquires IdentityRegistry {
         let account_addr = signer::address_of(account);
-        let registry = borrow_global_mut<IdentityRegistry>(account_addr);
+        // Registry is stored at the admin address, not the user address
+        let registry = borrow_global_mut<IdentityRegistry>(@0x1);
         let current_time = timestamp::now_seconds();
         
         // Check if user already has an identity
@@ -453,7 +454,8 @@ module FARE::onchain_identity {
     
     /// Check if user has an identity
     public fun has_identity(user: address): bool acquires IdentityRegistry {
-        let registry = borrow_global<IdentityRegistry>(user);
+        // Registry is stored at the admin address, not the user address
+        let registry = borrow_global<IdentityRegistry>(@0x1);
         table::contains(&registry.user_identities, user)
     }
     
@@ -466,7 +468,8 @@ module FARE::onchain_identity {
     
     /// Get identity status
     public fun get_identity_status(user: address): (bool, u8, u8, bool, bool, bool, vector<u8>) acquires IdentityRegistry {
-        let registry = borrow_global<IdentityRegistry>(user);
+        // Registry is stored at the admin address, not the user address
+        let registry = borrow_global<IdentityRegistry>(@0x1);
         
         if (!table::contains(&registry.user_identities, user)) {
             return (false, 0, 0, false, false, false, vector::empty())
@@ -583,7 +586,8 @@ module FARE::onchain_identity {
     
     /// Get user's KYC level
     public fun get_kyc_level(user: address): u8 acquires IdentityRegistry {
-        let registry = borrow_global<IdentityRegistry>(user);
+        // Registry is stored at the admin address, not the user address
+        let registry = borrow_global<IdentityRegistry>(@0x1);
         
         if (!table::contains(&registry.user_identities, user)) {
             return constants::get_kyc_level_none()
@@ -596,7 +600,8 @@ module FARE::onchain_identity {
     
     /// Get user's investor type
     public fun get_investor_type(user: address): u8 acquires IdentityRegistry {
-        let registry = borrow_global<IdentityRegistry>(user);
+        // Registry is stored at the admin address, not the user address
+        let registry = borrow_global<IdentityRegistry>(@0x1);
         
         if (!table::contains(&registry.user_identities, user)) {
             return 0

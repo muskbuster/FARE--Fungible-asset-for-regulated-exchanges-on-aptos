@@ -694,7 +694,8 @@ module FARE::token_information {
     
     /// Check if token is paused
     public fun is_token_paused(token_address: address): bool acquires TokenInformationRegistry {
-        let registry = borrow_global<TokenInformationRegistry>(token_address);
+        // Registry is stored at the admin address, not the token address
+        let registry = borrow_global<TokenInformationRegistry>(@0x1);
         
         if (!table::contains(&registry.token_status_info, token_address)) {
             return false
@@ -706,7 +707,8 @@ module FARE::token_information {
     
     /// Check if token is frozen
     public fun is_token_frozen(token_address: address): bool acquires TokenInformationRegistry {
-        let registry = borrow_global<TokenInformationRegistry>(token_address);
+        // Registry is stored at the admin address, not the token address
+        let registry = borrow_global<TokenInformationRegistry>(@0x1);
         
         if (!table::contains(&registry.token_status_info, token_address)) {
             return false

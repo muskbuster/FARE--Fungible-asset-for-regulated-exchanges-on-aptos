@@ -413,6 +413,31 @@ For support and questions:
 - [ ] Advanced analytics
 - [ ] Regulatory reporting automation
 
+## ⚠️ Important Implementation Disclaimer
+
+**This implementation does NOT use the Aptos Fungible Asset (FA) standard for balance tracking or transfer logic.**
+
+The current version uses a completely custom balance management system with:
+- Custom `user_balances` table for tracking token balances
+- Custom transfer logic that bypasses the standard FA framework  
+- Custom minting system that directly updates internal balance tables
+- Custom DVP transfer functions that don't integrate with FA standards
+
+**This is a temporary implementation for testing and development purposes.** For production use, this should be refactored to properly integrate with the Aptos Fungible Asset standard.
+
+### Current Limitations:
+- ❌ Not compatible with standard Aptos FA wallets
+- ❌ Cannot be used with standard FA transfer functions
+- ❌ Balance tracking is isolated from the Aptos ecosystem
+- ❌ No integration with Aptos primary fungible stores
+- ❌ Custom implementation may have security implications
+
+### Future Roadmap:
+- ✅ Refactor to use proper Aptos Fungible Asset standard
+- ✅ Integrate with primary fungible stores
+- ✅ Support standard FA wallet compatibility
+- ✅ Implement proper FA transfer mechanisms
+
 ## Disclaimer
 
 This software is provided for educational and development purposes. Users are responsible for ensuring compliance with applicable laws and regulations. The authors are not responsible for any legal or regulatory issues arising from the use of this software.
