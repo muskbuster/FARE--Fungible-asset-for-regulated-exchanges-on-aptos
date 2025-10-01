@@ -317,7 +317,7 @@ module FARE::trex_token {
         amount: u64
     ) acquires TRexTokenRegistry {
         let admin_addr = signer::address_of(admin);
-        let registry = borrow_global_mut<TRexTokenRegistry>(@0x1);
+        let registry = borrow_global_mut<TRexTokenRegistry>(admin_addr);
         
         // Check if token is T-REX compliant
         assert!(table::contains(&registry.trex_tokens, token_address), constants::get_compliance_module_not_found_error());
@@ -353,7 +353,7 @@ module FARE::trex_token {
         amount: u64
     ) acquires TRexTokenRegistry {
         let admin_addr = signer::address_of(admin);
-        let registry = borrow_global_mut<TRexTokenRegistry>(@0x1);
+        let registry = borrow_global_mut<TRexTokenRegistry>(admin_addr);
         
         // Check if token is T-REX compliant
         assert!(table::contains(&registry.trex_tokens, token_address), constants::get_compliance_module_not_found_error());
@@ -771,14 +771,16 @@ module FARE::trex_token {
     
     /// Check if token is T-REX compliant
     public fun is_trex_compliant(token_address: address): bool acquires TRexTokenRegistry {
-        // Registry is stored at the admin address, not the token address
+        // Note: This function needs admin address to access registry
+        // For now, we'll use a placeholder - this needs to be refactored
         let registry = borrow_global<TRexTokenRegistry>(@0x1);
         table::contains(&registry.trex_tokens, token_address)
     }
     
     /// Get T-REX token configuration
     public fun get_trex_token_config(token_address: address): (bool, bool, u8, u8, bool, bool, bool, u64, u64) acquires TRexTokenRegistry {
-        // Registry is stored at the admin address, not the token address
+        // Note: This function needs admin address to access registry
+        // For now, we'll use a placeholder - this needs to be refactored
         let registry = borrow_global<TRexTokenRegistry>(@0x1);
         assert!(table::contains(&registry.trex_tokens, token_address), constants::get_compliance_module_not_found_error());
         
@@ -798,7 +800,8 @@ module FARE::trex_token {
     
     /// Get user balance for token
     public fun get_user_balance(user: address, token_address: address): u64 acquires TRexTokenRegistry {
-        // Registry is stored at the admin address, not the user address
+        // Note: This function needs admin address to access registry
+        // For now, we'll use a placeholder - this needs to be refactored
         let registry = borrow_global<TRexTokenRegistry>(@0x1);
         
         if (!table::contains(&registry.user_balances, user)) {
@@ -825,6 +828,8 @@ module FARE::trex_token {
         token_address: address,
         amount: u64
     ) acquires TRexTokenRegistry {
+        // Note: This function needs admin address to access registry
+        // For now, we'll use a placeholder - this needs to be refactored
         let registry = borrow_global_mut<TRexTokenRegistry>(@0x1);
         
         // Check if token is T-REX compliant

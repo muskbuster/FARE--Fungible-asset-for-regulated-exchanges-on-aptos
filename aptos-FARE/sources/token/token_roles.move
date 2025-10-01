@@ -615,6 +615,8 @@ module FARE::token_roles {
     /// Check if account is frozen
     public fun is_account_frozen(token_address: address, account: address): bool acquires TokenRolesRegistry {
         // Registry is stored at the admin address, not the user address
+        // Note: This function needs admin address to access registry
+        // For now, we'll use a placeholder - this needs to be refactored
         let registry = borrow_global<TokenRolesRegistry>(@0x1);
         
         if (!table::contains(&registry.account_freezes, token_address)) {

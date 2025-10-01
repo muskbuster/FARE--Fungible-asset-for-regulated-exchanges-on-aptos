@@ -80,7 +80,8 @@ module FARE::onchain_identity {
         date_of_birth: u64
     ) acquires IdentityRegistry {
         let account_addr = signer::address_of(account);
-        // Registry is stored at the admin address, not the user address
+        // Note: This function needs admin address to access registry
+        // For now, we'll use a placeholder - this needs to be refactored
         let registry = borrow_global_mut<IdentityRegistry>(@0x1);
         let current_time = timestamp::now_seconds();
         
@@ -455,6 +456,8 @@ module FARE::onchain_identity {
     /// Check if user has an identity
     public fun has_identity(user: address): bool acquires IdentityRegistry {
         // Registry is stored at the admin address, not the user address
+        // Note: This function needs admin address to access registry
+        // For now, we'll use a placeholder - this needs to be refactored
         let registry = borrow_global<IdentityRegistry>(@0x1);
         table::contains(&registry.user_identities, user)
     }
@@ -469,6 +472,8 @@ module FARE::onchain_identity {
     /// Get identity status
     public fun get_identity_status(user: address): (bool, u8, u8, bool, bool, bool, vector<u8>) acquires IdentityRegistry {
         // Registry is stored at the admin address, not the user address
+        // Note: This function needs admin address to access registry
+        // For now, we'll use a placeholder - this needs to be refactored
         let registry = borrow_global<IdentityRegistry>(@0x1);
         
         if (!table::contains(&registry.user_identities, user)) {
@@ -568,7 +573,9 @@ module FARE::onchain_identity {
     
     /// Get total number of identities
     public fun get_total_identities(): u64 acquires IdentityRegistry {
-        let registry = borrow_global<IdentityRegistry>(@0x0); // This will need to be updated with actual address
+        // Note: This function needs admin address to access registry
+        // For now, we'll use a placeholder - this needs to be refactored
+        let registry = borrow_global<IdentityRegistry>(@0x0);
         registry.total_identities
     }
     
@@ -587,6 +594,8 @@ module FARE::onchain_identity {
     /// Get user's KYC level
     public fun get_kyc_level(user: address): u8 acquires IdentityRegistry {
         // Registry is stored at the admin address, not the user address
+        // Note: This function needs admin address to access registry
+        // For now, we'll use a placeholder - this needs to be refactored
         let registry = borrow_global<IdentityRegistry>(@0x1);
         
         if (!table::contains(&registry.user_identities, user)) {
@@ -601,6 +610,8 @@ module FARE::onchain_identity {
     /// Get user's investor type
     public fun get_investor_type(user: address): u8 acquires IdentityRegistry {
         // Registry is stored at the admin address, not the user address
+        // Note: This function needs admin address to access registry
+        // For now, we'll use a placeholder - this needs to be refactored
         let registry = borrow_global<IdentityRegistry>(@0x1);
         
         if (!table::contains(&registry.user_identities, user)) {

@@ -316,7 +316,8 @@ module FARE::modular_compliance {
         check_data: vector<u8>
     ): ComprehensiveComplianceResult acquires ModularComplianceRegistry {
         let account_addr = signer::address_of(account);
-        // Registry is stored at the admin address, not the user address
+        // Note: This function needs admin address to access registry
+        // For now, we'll use a placeholder - this needs to be refactored
         let registry = borrow_global_mut<ModularComplianceRegistry>(@0x1);
         let current_time = timestamp::now_seconds();
         
