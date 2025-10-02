@@ -1,4 +1,4 @@
-# T-REX Compliant Token System for Aptos
+# FARE - A T-REX Compliant Token System for Aptos
 
 A comprehensive, modular smart contract system implementing the T-REX (Token for Regulated EXchanges) standard on the Aptos blockchain. This system provides full compliance with securities regulations while leveraging Aptos's unique capabilities for performance and safety.
 
@@ -295,33 +295,58 @@ Run tests with:
 aptos move test
 ```
 
-## Gas Optimization
-
-The system is optimized for gas efficiency:
-
-- **Efficient Storage**: Uses Aptos Tables for large datasets
-- **Batch Operations**: Supports batch processing where possible
-- **View Functions**: Read-only operations don't consume gas
-- **Event Optimization**: Minimal event data for gas savings
-
-## Integration
-
-### DeFi Protocols
-
-The system is designed to integrate with existing Aptos DeFi protocols:
-
-- **Fungible Asset Standard**: Uses Aptos Fungible Asset standard
-- **Primary Fungible Store**: Integrates with Aptos primary store
-- **Object Model**: Leverages Aptos Object model for identity
-
-### External Systems
-
-- **Oracle Integration**: Real-time compliance data
-- **KYC Providers**: External identity verification
-- **Compliance Services**: Third-party compliance checking
-- **Regulatory Reporting**: Automated regulatory reporting
-
 ## Deployment
+
+### Devnet Deployment ✅
+
+The FARE system has been successfully deployed to Aptos Devnet using a split package approach to overcome the 60KB transaction size limit.
+
+#### Deployment Details
+
+**Account Address**: `0x47ac98d0c7f09ae31de82ecf3301b1849b61004ce43529f13b85efc95380fc76`
+
+**Deployed Packages**:
+
+1. **Core Package** (Transaction: `0x03f30523f02f1ee76d7ddc0d0548f9724325652cfcab6fac6c56e712c05902c8`)
+   - Modules: `constants`, `access_control`, `identity_storage`, `onchain_identity`, `claim_issuers`, `compliance_registry`, `modular_compliance`, `transfer_rules`, `country_restrictions`
+   - Size: 47,009 bytes
+   - Gas Used: 10,269
+
+2. **Token Package** (Transaction: `0x2fbae0b1b568f8a9728c858715e8e644ead6fbabb132db1f197729006216745c`)
+   - Modules: `trex_token`, `token_information`, `token_roles`
+   - Size: 29,832 bytes
+   - Gas Used: 8,279
+
+#### Deployment Strategy
+
+Due to the comprehensive nature of the T-REX system, the original package exceeded Aptos's 60KB transaction size limit. The solution was to split the modules into logical packages:
+
+- **Core Package**: Identity, compliance, and utility modules
+- **Token Package**: T-REX token and related token management modules
+- **DVP Package**: Delivery vs Payment/Exchange modules (planned)
+
+#### Verification
+
+You can verify the deployment on Aptos Explorer:
+- [Core Package Transaction](https://explorer.aptoslabs.com/txn/0x03f30523f02f1ee76d7ddc0d0548f9724325652cfcab6fac6c56e712c05902c8?network=devnet)
+- [Token Package Transaction](https://explorer.aptoslabs.com/txn/0x2fbae0b1b568f8a9728c858715e8e644ead6fbabb132db1f197729006216745c?network=devnet)
+
+#### Usage on Devnet
+
+To interact with the deployed contracts:
+
+```bash
+# Initialize the system
+aptos move run --function-id 0x47ac98d0c7f09ae31de82ecf3301b1849b61004ce43529f13b85efc95380fc76::access_control::initialize
+
+# Create an identity
+aptos move run --function-id 0x47ac98d0c7f09ae31de82ecf3301b1849b61004ce43529f13b85efc95380fc76::onchain_identity::create_identity \
+  --args u8:1 u8:1 string:"US" u64:946684800
+
+# Create a T-REX token
+aptos move run --function-id 0x47ac98d0c7f09ae31de82ecf3301b1849b61004ce43529f13b85efc95380fc76::trex_token::create_trex_token \
+  --args string:"TestToken" string:"TEST" u8:8 string:"Test Token" string:"" string:"" u64:1000000000000000000 bool:true bool:true bool:true u8:1 u8:1 bool:true bool:true bool:true
+```
 
 ### Mainnet Deployment
 
@@ -330,9 +355,9 @@ The system is designed to integrate with existing Aptos DeFi protocols:
 aptos move compile
 ```
 
-2. **Deploy Modules**:
+2. **Deploy Modules** (Note: May require split package approach):
 ```bash
-aptos move publish
+aptos move publish --override-size-check --included-artifacts none
 ```
 
 3. **Initialize System**:
@@ -349,69 +374,9 @@ aptos config set-profile default --profile testnet
 
 2. **Deploy to Testnet**:
 ```bash
-aptos move publish --profile testnet
+aptos move publish --profile testnet --override-size-check --included-artifacts none
 ```
 
-## Monitoring
-
-### Events
-
-Monitor system events for:
-
-- **Identity Events**: Identity creation, updates, freezes
-- **Compliance Events**: Compliance check results
-- **Transfer Events**: All token transfers
-- **Admin Events**: Administrative actions
-
-### Metrics
-
-Key metrics to monitor:
-
-- **Transfer Volume**: Daily/monthly transfer volumes
-- **Compliance Rate**: Percentage of compliant transfers
-- **Identity Verification**: KYC completion rates
-- **System Health**: Module status and performance
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests for new functionality
-5. Submit a pull request
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## Support
-
-For support and questions:
-
-- **Documentation**: Check the inline documentation in the code
-- **Issues**: Open an issue on GitHub
-- **Discussions**: Use GitHub Discussions for questions
-
-## Roadmap
-
-### Phase 1: Core Implementation ✅
-- [x] Identity system
-- [x] Compliance modules
-- [x] T-REX token
-- [x] DVP/DVE system
-- [x] Access control
-
-### Phase 2: Enhanced Features
-- [ ] Multi-chain support
-- [ ] Advanced compliance rules
-- [ ] Automated reporting
-- [ ] Integration with external KYC providers
-
-### Phase 3: Enterprise Features
-- [ ] White-label solutions
-- [ ] Custom compliance modules
-- [ ] Advanced analytics
-- [ ] Regulatory reporting automation
 
 ## ⚠️ Important Implementation Disclaimer
 
@@ -437,7 +402,3 @@ The current version uses a completely custom balance management system with:
 - ✅ Integrate with primary fungible stores
 - ✅ Support standard FA wallet compatibility
 - ✅ Implement proper FA transfer mechanisms
-
-## Disclaimer
-
-This software is provided for educational and development purposes. Users are responsible for ensuring compliance with applicable laws and regulations. The authors are not responsible for any legal or regulatory issues arising from the use of this software.
